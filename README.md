@@ -13,6 +13,23 @@ Private, local-first audio conversion for WAV, MP3 and FLAC. Minimal UI, wavefor
 
 The first start requires an internet connection for npm installation. Subsequent local conversions do not upload your audio. Next.js development builds may still request development-related assets; production hosting should be tested separately. If you replace the files of an already-installed project, run a fresh dependency installation (the batch launcher handles missing dependencies, but does not upgrade existing package installations automatically).
 
+## Cloudflare Pages — no terminal required
+
+This repository is configured to export a fully static site to Cloudflare Pages. Audio remains in the browser; the FFmpeg JS and chunked WebAssembly assets are served from the same site, not a third-party CDN. After replacing the files in your existing `convert` GitHub Desktop repository, commit and push. Then select these settings in Cloudflare **Pages**:
+
+| Setting | Value |
+|---|---|
+| Framework preset | `Next.js (Static HTML Export)` |
+| Production branch | `main` |
+| Build command | `npm run build` |
+| Build output directory | `out` |
+| Root directory | `/` |
+| Environment variable | `NODE_VERSION` = `22` |
+
+Cloudflare automatically installs dependencies. `npm run build` runs the `prebuild` script that prepares the self-hosted ESM engine and chunks. Do not use `next start` on Cloudflare Pages; `START.bat` is only for local Windows development. The generated `out` folder is uploaded by Cloudflare; it should not be committed.
+
+**Before public release:** The original application is MIT, but the currently distributed `@ffmpeg/core` is GPL-2.0-or-later. Read `THIRD_PARTY_NOTICES.md` and fulfill the applicable redistribution and corresponding-source obligations for the exact upstream binaries you publish. Hosting the engine yourself does not eliminate these obligations.
+
 ## Deployment / quality checks
 
 On CI or a machine with npm network access:
@@ -25,7 +42,7 @@ npm run check:assets
 npm run build
 ```
 
-The FFmpeg worker and WebAssembly files are self-hosted. `scripts/copy-ffmpeg.mjs` copies the installed ESM core and unbundled worker into `public/ffmpeg` during installation and before build/dev, avoiding dynamic imports through Next.js bundling. Do **not** commit or include `node_modules`, `.next`, or the generated `public/ffmpeg` directory in the public source archive.
+The FFmpeg engine stays on your own origin. `scripts/copy-ffmpeg.mjs` copies the unbundled ESM worker and **splits the large WebAssembly binary into cacheable parts of at most 20 MiB**, with a generated manifest and SHA-256 checksums. The browser checks the parts and reconstructs a temporary WebAssembly Blob URL before initializing FFmpeg. This is necessary because Cloudflare Pages limits individual assets to 25 MiB and the upstream core binary exceeds that limit. Generated assets are recreated at install and before every build; do not commit `node_modules`, `.next`, `out` or `public/ffmpeg`.
 
 ### User experience and memory
 

@@ -3,6 +3,7 @@
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
 import { engineURLs, explainEngineError } from "./engine-config";
+import { loadWasmObjectURL } from "./wasm-assets";
 import type { AudioFormat } from "./audio";
 
 type Progress = (fraction: number) => void;
@@ -46,19 +47,20 @@ export async function getRuntime(): Promise<FFmpeg> {
     const urls = engineURLs(window.location.origin);
     await Promise.all([
       verifyAsset(urls.coreURL),
-      verifyAsset(urls.wasmURL),
+      verifyAsset(urls.wasmManifestURL),
       verifyAsset(urls.classWorkerURL),
       ...urls.dependencies.map(verifyAsset),
     ]);
     // Key fix: a self-hosted, UNBUNDLED module worker + ESM core.
     // With Next.js, the default worker may rewrite dynamic import(coreURL).
     // Pass absolute URLs because FFmpeg resolves classWorkerURL vs import.meta.url.
+    const wasmObjectURL = await loadWasmObjectURL(urls.wasmManifestURL, urls.wasmPartsBaseURL);
     let timeout: ReturnType<typeof setTimeout> | undefined;
     try {
       await Promise.race([
         instance.load({
           coreURL: urls.coreURL,
-          wasmURL: urls.wasmURL,
+          wasmURL: wasmObjectURL,
           classWorkerURL: urls.classWorkerURL,
         }),
         new Promise<never>((_, reject) => {
@@ -67,6 +69,7 @@ export async function getRuntime(): Promise<FFmpeg> {
       ]);
     } finally {
       clearTimeout(timeout);
+      URL.revokeObjectURL(wasmObjectURL);
     }
     return instance;
   })();
