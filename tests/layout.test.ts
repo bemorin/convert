@@ -29,8 +29,11 @@ test('Multifile picker, page-level drag, queue navigation and sequential ZIP exp
   const sidebar = readFileSync('components/collection-panel.tsx', 'utf8');
   assert.match(ui, /type="file"\s*multiple/);
   assert.match(ui, /window\.addEventListener\("drop", drop\)/);
-  assert.match(ui, /ingestFiles\(Array\.from\(event\.dataTransfer\?\.files \?\? \[\]\)\)/);
-  assert.match(ui, /className="global-drop-overlay"/);
+  // Drops go through filesFromDrop, which also opens dropped folders (same as Compress).
+  assert.match(ui, /filesFromDrop\(event\.dataTransfer\)/);
+  // While dragging, a halo lights up inside the frame, above the content; no full-page overlay.
+  assert.match(css, /\.drag-halo\s*\{[^}]*z-index:\s*4/s);
+  assert.doesNotMatch(ui, /global-drop-overlay/);
   assert.match(sidebar, /className="queue-list"/);
   assert.match(ui, /await ensureConverted\(item, target,/);
   assert.match(ui, /compression: "STORE"/);

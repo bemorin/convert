@@ -191,9 +191,9 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid var(--muted);
   border-radius: 7px;
   background: var(--drag-glow);
-  box-shadow: inset 0 0 70px var(--drag-glow);
+  box-shadow: inset 0 0 80px var(--drag-glow);
   pointer-events: none;
-  z-index: 0;
+  z-index: 4;
 }
 .empty-state {
   position: relative;
@@ -205,12 +205,15 @@ a { color: inherit; text-decoration: none; }
   padding: 68px 24px 80px;
   width: 100%;
 }
-.stack-mark { position: relative; width: 124px; height: 113px; color: var(--ink); margin-bottom: 36px; }
-.stack-layer { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.stack-layer-0 { color: var(--ink); }
-.stack-layer-1 { color: var(--muted); }
-.stack-layer-2 { color: var(--faint); }
-.stack-glow { pointer-events: none; display: block; position: absolute; inset: 24px; border-radius: 100%; background: var(--drag-glow); filter: blur(25px); }
+.wave-mark { position: relative; width: 128px; height: 96px; margin-bottom: 38px; display: grid; place-items: center; }
+.wave-bars { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%; height: 100%; }
+.wave-bar { flex: 0 0 7px; height: 50%; border-radius: 99px; background: var(--ink); will-change: height; }
+.wave-glow { pointer-events: none; position: absolute; inset: 18px 10px; border-radius: 100%; background: var(--drag-glow); filter: blur(26px); }
+/* The small mark beats while a track plays or files convert. */
+.logo-bar { transform-box: fill-box; transform-origin: center; }
+.logo.is-active .logo-bar { animation: logo-beat .9s cubic-bezier(.45,0,.55,1) infinite alternate; }
+@keyframes logo-beat { from { transform: scaleY(.45); } to { transform: scaleY(1.08); } }
+@media (prefers-reduced-motion: reduce) { .logo.is-active .logo-bar { animation: none; } }
 .empty-copy h1 {
   font-size: clamp(26px, 3.2vw, 35px);
   line-height: 1.18;
@@ -354,7 +357,7 @@ a { color: inherit; text-decoration: none; }
   .brand-divider { margin: 0; }
   .drop-frame { flex-grow: 1; min-height: 0; border-radius: 8px; }
   .empty-state { padding: 55px 12px 65px; }
-  .stack-mark { width: 105px; height: 96px; margin-bottom: 28px; }
+  .wave-mark { width: 110px; height: 82px; margin-bottom: 30px; }
   .empty-copy h1 { font-size: clamp(23px, 7.3vw, 29px); }
   .empty-copy p { font-size: 12px; }
   .drop-frame.has-file { padding: clamp(13px, 2.7svh, 24px) clamp(10px, 3.2vw, 18px); }
@@ -498,12 +501,6 @@ a { color: inherit; text-decoration: none; }
 .clear-queue:hover:not(:disabled) { color: var(--ink); background: var(--subtle); }
 .clear-queue:disabled { opacity: .35; }
 .track-error { overflow-wrap: anywhere; color: var(--error-ink); font: 10px/1.5 ui-monospace,Menlo,monospace; }
-.global-drop-overlay { position: fixed; z-index: 999; inset: 8px; display: grid; place-items: center; border: 1.5px solid var(--ink); outline: 7px solid var(--page); border-radius: 15px; background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(16px); pointer-events: none; }
-.global-drop-overlay:before { content: ""; position: absolute; inset: 10px; border-radius: 9px; border: 1px dashed var(--muted); }
-.global-drop-content { display: flex; flex-direction: column; align-items: center; text-align: center; z-index: 1; padding: 30px; }
-.global-drop-content .stack-mark { margin-bottom: 2px; }
-.global-drop-content strong { font-size: clamp(23px,4.1vw,37px); letter-spacing: -.07em; font-weight: 590; margin: 14px 0 13px; }
-.global-drop-content > span { color: var(--muted); font: 10px ui-monospace,Menlo,monospace; letter-spacing: .1em; }
 
 @media (min-width: 1020px) {
   .multi-state .studio-grid { grid-template-columns: minmax(0,1fr) minmax(220px,255px); gap: 22px; align-items: center; }
@@ -527,10 +524,7 @@ a { color: inherit; text-decoration: none; }
   .export-estimate { padding-left: 22px; font-size: 8px; }
   .batch-button { min-height: 58px; }
   .batch-size { font-size: 8px; white-space: normal; overflow-wrap: anywhere; }
-  .global-drop-overlay { inset: 7px; }
-  .global-drop-content { padding: 14px; }
-  .global-drop-content .stack-mark { transform: scale(.8); margin-bottom: -10px; }
-}
+      }
 @media (max-width: 360px) {
   /* Keep the add control and status legible on 320px phones. */
   .topbar .brand-name { font-size: 14px; }

@@ -17,10 +17,11 @@ import {
 } from "framer-motion";
 import {
   ArrowDownToLine, ArrowRight, ArrowUpRight, Check, Command,
-  FileAudio2, Files, Plus, RefreshCw,
+  FileAudio2, Plus, RefreshCw,
   Upload, X,
 } from "lucide-react";
 import { Logo } from "./logo";
+import { filesFromDrop } from "../lib/drop";
 import { ThemeToggle } from "./theme-toggle";
 import {
   bytesLabel, downloadName, inspectAudio, otherFormats, targetCopy,
@@ -34,7 +35,7 @@ import type { BatchStage, Job, QueueItem, ReadyArchive } from "@/lib/studio-type
 import { estimateBatch, estimateItem, estimateLabel, readAudioFacts, MAX_BATCH_ESTIMATED_OUTPUT_BYTES, shortSize } from "@/lib/estimates";
 import { batchFraction } from "@/lib/batch-progress";
 import { CollectionPanel } from "./collection-panel";
-import { StackMark } from "./stack-mark";
+import { WaveMark } from "./wave-mark";
 import { Waveform } from "./waveform";
 import { useAudioPreview } from "./use-audio-preview";
 
@@ -179,7 +180,10 @@ export function AudioStudio() {
       event.preventDefault();
       depth = 0;
       setDragging(false);
-      ingestFiles(Array.from(event.dataTransfer?.files ?? []));
+      void filesFromDrop(event.dataTransfer).then(({ files, fromFolder }) => {
+        // From a folder, keep the audio and quietly leave the rest (covers, notes, project files).
+        ingestFiles(fromFolder ? files.filter((file) => file.type.startsWith("audio/") || /\.(wav|wave|mp3|flac)$/i.test(file.name)) : files);
+      });
     };
     window.addEventListener("dragenter", enter);
     window.addEventListener("dragover", over);
@@ -377,7 +381,7 @@ export function AudioStudio() {
       <div className="workspace">
         <header className="topbar">
           <a className="brand" href="/" aria-label="Convert">
-            <Logo size={28} className="brand-logo" />
+            <Logo size={28} className="brand-logo" active={preview.playing || job !== null} />
             <span className="brand-name">Convert</span>
           </a>
           <div className="topbar-actions">
@@ -405,20 +409,20 @@ export function AudioStudio() {
         >
           <motion.div className="hover-spotlight" style={{ background: spotlight }} aria-hidden="true" />
           <motion.div className="drag-halo" aria-hidden="true" initial={false}
-            animate={{ opacity: dragging ? 1 : 0, scale: dragging ? 1 : .96 }}
-            transition={{ duration: reduceMotion ? 0 : .22 }} />
+            animate={{ opacity: dragging ? 1 : 0, scale: dragging || reduceMotion ? 1 : .985 }}
+            transition={{ duration: reduceMotion ? 0 : .22, ease: [0.22, 1, 0.36, 1] }} />
           <AnimatePresence mode="wait" initial={false}>
             {!selected ? (
               <motion.div className="empty-state" key="empty"
                 initial={reduceMotion ? false : { opacity: 0, filter: "blur(5px)", y: 9 }}
-                animate={{ opacity: 1, filter: "blur(0px)", y: dragging ? -5 : 0 }}
+                animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
                 exit={reduceMotion ? undefined : { opacity: 0, filter: "blur(5px)", y: -8 }}
                 transition={{ duration: reduceMotion ? 0 : .32 }}>
-                <StackMark active={dragging} />
-                <motion.div className="empty-copy" animate={reduceMotion ? undefined : { y: dragging ? -2 : 0 }}>
-                  <h1>{dragging ? "Let them go." : "Drop audio here."}</h1>
-                  <p>{dragging ? "Every file joins your collection." : "One track or a whole collection. Zero friction."}</p>
-                </motion.div>
+                <WaveMark active={dragging} />
+                <div className="empty-copy">
+                  <h1>Drop audio here.</h1>
+                  <p>One track, a whole collection or a folder. Zero friction.</p>
+                </div>
                 <motion.button type="button" className="browse-button" onClick={() => picker.current?.click()}
                   whileHover={reduceMotion ? undefined : { y: -2, scale: 1.025 }}
                   whileTap={reduceMotion ? undefined : { scale: .965 }}>
@@ -535,21 +539,6 @@ export function AudioStudio() {
           </nav>
         </footer>
       </div>
-      <AnimatePresence>
-        {dragging && (
-          <motion.div className="global-drop-overlay" role="presentation" aria-hidden="true"
-            initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            transition={{ duration: reduceMotion ? 0 : .16 }}>
-            <motion.div className="global-drop-content" initial={reduceMotion ? false : { y: 12, scale: .97 }}
-              animate={{ y: 0, scale: 1 }} exit={{ y: 12, scale: .97 }} transition={{ type: "spring", stiffness: 270, damping: 24 }}>
-              <StackMark active />
-              <Files size={20} strokeWidth={1.45} />
-              <strong>{items.length ? "Add to your collection" : "Drop your audio"}</strong>
-              <span>WAV · MP3 · FLAC · MULTIPLE FILES</span>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </main>
   );
 }
