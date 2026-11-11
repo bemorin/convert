@@ -1,8 +1,8 @@
 # Convert by Ben Morin
 
-Private, local-first audio conversion for WAV, MP3 and FLAC. Minimal UI, waveform playback, whole-page drag & drop, a collection of up to 24 files, two instant single-file export choices, and independently estimated ZIP exports for each target format. The interface follows your operating system's light/dark preference, without a manual toggle.
+Private, local-first audio conversion for WAV, MP3 and FLAC. Minimal UI, waveform playback, whole-page drag & drop, a collection of up to 24 files, two instant single-file export choices, and independently estimated ZIP exports for each target format. The interface follows your operating system's light or dark preference until you pick one with the switch in the top bar; the choice is remembered in that browser.
 
-**Proposed address:** `https://convert.bemorin.com` (configure DNS/hosting separately). The website title is **Convert by Ben Morin**. The favicon points to the Planner favicon URL; verify that the Planner serves `/favicon.ico` before going live, or place the authoritative favicon in `public/favicon.ico` and update `app/layout.tsx` to use it. No favicon bytes are bundled from an unverified URL.
+**Proposed address:** `https://convert.bemorin.com` (configure DNS/hosting separately). The website title is **Convert by Ben Morin**. The favicon is the Convert mark, in `public/icon.svg`.
 
 ## Windows — start without typing commands
 

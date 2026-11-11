@@ -16,10 +16,12 @@ import {
   useSpring,
 } from "framer-motion";
 import {
-  ArrowDownToLine, ArrowRight, AudioLines, Check, Command,
-  FileAudio2, Files, LockKeyhole, Plus, RefreshCw,
+  ArrowDownToLine, ArrowRight, ArrowUpRight, Check, Command,
+  FileAudio2, Files, Plus, RefreshCw,
   Upload, X,
 } from "lucide-react";
+import { Logo } from "./logo";
+import { ThemeToggle } from "./theme-toggle";
 import {
   bytesLabel, downloadName, inspectAudio, otherFormats, targetCopy,
   type AudioFormat,
@@ -374,11 +376,9 @@ export function AudioStudio() {
       />
       <div className="workspace">
         <header className="topbar">
-          <a className="brand" href="https://bemorin.com" target="_blank" rel="noopener noreferrer" aria-label="Bemorin website">
-            <span className="brand-icon" aria-hidden="true"><AudioLines size={17} strokeWidth={1.8} /></span>
-            <span className="brand-name">bemorin<span className="brand-period">.</span></span>
-            <span className="brand-divider" />
-            <span className="brand-description">convert</span>
+          <a className="brand" href="/" aria-label="Convert">
+            <Logo size={28} className="brand-logo" />
+            <span className="brand-name">Convert</span>
           </a>
           <div className="topbar-actions">
             {items.length > 0 && (
@@ -387,6 +387,7 @@ export function AudioStudio() {
                 title="Add more audio files (Ctrl/⌘ + O)"><Plus size={14} /> <span>Add files</span></motion.button>
             )}
             <div className="topbar-right"><span className="topbar-led" /><span>{statusText}</span></div>
+            <ThemeToggle />
           </div>
         </header>
 
@@ -524,8 +525,14 @@ export function AudioStudio() {
         </AnimatePresence>
         <span className="visually-hidden" role="status" aria-live="polite">{announcement}</span>
         <footer className="bottom-bar">
-          <div className="footer-left"><LockKeyhole size={12} strokeWidth={1.7} /><span>PRIVATE BY DESIGN</span><span className="footer-dot">·</span><span>NO UPLOADS</span></div>
-          <div className="footer-right"><span>DROP FILES ANYTIME</span><a className="footer-licenses" href="/licenses">Licenses</a><span className="footer-mark">B<span>.</span></span></div>
+          <div className="footer-brand">
+            <Logo size={18} />
+            <span><b>Convert</b> By <a href="https://bemorin.com" target="_blank" rel="noopener noreferrer">Ben Morin</a></span>
+          </div>
+          <nav className="footer-links" aria-label="About this app">
+            <a href="https://github.com/bemorin/convert" target="_blank" rel="noopener noreferrer">GitHub <ArrowUpRight size={12} strokeWidth={1.8} aria-hidden="true" /></a>
+            <a href="/licenses">Licenses</a>
+          </nav>
         </footer>
       </div>
       <AnimatePresence>

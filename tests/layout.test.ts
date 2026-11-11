@@ -44,7 +44,9 @@ test('Sidebar height is independent of item count with internal scrolling and pe
   assert.match(css, /\.queue-panel\s*\{[^}]*height:\s*clamp\(/s);
   assert.match(css, /\.queue-panel\s*\{[^}]*overflow:\s*hidden/s);
   assert.match(css, /\.queue-list\s*\{[^}]*overflow-y:\s*auto/s);
-  assert.match(css, /\.queue-list\s*\{[^}]*scrollbar-width:\s*thin/s);
+  // Thin scrollbars in the app's colours: ::-webkit rules, and the standard ones for Firefox only.
+  assert.match(css, /::-webkit-scrollbar-thumb\s*\{[^}]*background-color:\s*var\(--dash\)/s);
+  assert.match(css, /@supports not selector\(::-webkit-scrollbar\)\s*\{[^}]*scrollbar-width:\s*thin/s);
   assert.match(css, /\.batch-area\s*\{[^}]*flex:\s*0 0 auto/s);
 });
 test('Batch progress covers overall progress, per-track indicator and ZIP packaging', () => {

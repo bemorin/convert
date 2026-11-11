@@ -24,7 +24,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     color-scheme: dark;
     --page: #090a0a;
     --surface: #0c0d0d;
@@ -46,6 +46,28 @@
     --error-bg: #211816;
     --error-ink: #f1afa1;
   }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #090a0a;
+  --surface: #0c0d0d;
+  --ink: #f1f2ef;
+  --muted: #838784;
+  --faint: #5d625f;
+  --line: #222524;
+  --dash: #313634;
+  --subtle: #151716;
+  --chip: #202321;
+  --focus: #96a19a;
+  --hover-glow: rgb(226 242 232 / 3.2%);
+  --drag-glow: rgb(210 230 216 / 6%);
+  --wave-rest: #313633;
+  --wave-active: #d8e1d9;
+  --wave-cursor: #a2b1a8;
+  --button-ink: #101110;
+  --shadow: 0 24px 65px rgb(0 0 0 / 11%);
+  --error-bg: #211816;
+  --error-ink: #f1afa1;
 }
 
 * { box-sizing: border-box; }
@@ -106,23 +128,27 @@ a { color: inherit; text-decoration: none; }
 }
 .topbar, .bottom-bar { display: flex; align-items: center; justify-content: space-between; flex: 0 0 auto; }
 .topbar { height: 74px; padding: 0 11px; min-width: 0; gap: 10px; }
-.brand { display: inline-flex; align-items: center; gap: 12px; height: 40px; min-width: 0; flex-shrink: 1; }
-.brand-icon {
-  width: 30px;
-  height: 30px;
+.brand { display: inline-flex; align-items: center; gap: 10px; height: 40px; min-width: 0; flex-shrink: 1; border-radius: 9px; }
+.brand-logo { flex: 0 0 auto; color: var(--ink); transition: transform 420ms cubic-bezier(.22,1,.36,1); }
+.brand:hover .brand-logo { transform: translateY(-1px) scale(.94); }
+.brand-name { font-size: 15px; font-weight: 650; letter-spacing: -.035em; }
+.logo-fill { fill: var(--surface); }
+.theme-toggle {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
-  color: var(--ink);
   border: 1px solid var(--line);
   border-radius: 9px;
-  transition: border-color 220ms, transform 350ms cubic-bezier(.2,.8,.2,1);
+  background: var(--surface);
+  color: var(--muted);
+  transition: color 180ms, border-color 180ms, transform 220ms cubic-bezier(.22,1,.36,1);
 }
-.brand:hover .brand-icon { transform: rotate(-7deg); border-color: var(--muted); }
-.brand-name { font-size: 14px; font-weight: 680; letter-spacing: -.06em; }
-.brand-period { color: var(--faint); }
-.brand-divider { height: 15px; width: 1px; background: var(--line); margin: 0 2px 0 1px; }
-.brand-description { font: 11px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: -.015em; color: var(--muted); }
-.topbar-right, .bottom-bar, .eyebrow, .preview-bottomline, .file-kicker, .file-meta, .export-heading, .export-footnote, .another-file, .paste-copy, .drag-caption, .error-notice {
+.theme-toggle:hover { color: var(--ink); border-color: var(--muted); }
+.theme-toggle:active { transform: scale(.94); }
+.theme-icon { display: grid; place-items: center; }
+.topbar-right, .eyebrow, .preview-bottomline, .file-kicker, .file-meta, .export-heading, .export-footnote, .another-file, .paste-copy, .drag-caption, .error-notice {
   font-family: ui-monospace, SFMono-Regular, SFMono-Regular, Menlo, Consolas, monospace;
 }
 .topbar-right { display: flex; gap: 10px; align-items: center; font-size: 10px; letter-spacing: .035em; color: var(--muted); white-space: nowrap; flex: 0 0 auto; }
@@ -282,14 +308,27 @@ a { color: inherit; text-decoration: none; }
 
 .error-notice { align-self: center; max-width: min(740px, calc(100% - 16px)); overflow-wrap: anywhere; display: flex; align-items: center; justify-content: space-between; gap: 20px; border: 1px solid var(--error-ink); color: var(--error-ink); border-radius: 7px; background: var(--error-bg); font-size: 10px; padding: 10px 12px; margin: 10px 0 0; }
 .error-notice button { border: 0; background: transparent; color: inherit; display: grid; place-items: center; }
-.bottom-bar { height: 61px; padding: 0 12px; color: var(--faint); font-size: 9px; letter-spacing: .075em; }
-.footer-left, .footer-right { display: inline-flex; align-items: center; gap: 9px; }
-.footer-right { gap: 16px; }
-.footer-licenses { text-transform: none; letter-spacing: 0; }
-.footer-licenses:hover { color: var(--ink); text-decoration: underline; }
-.footer-dot { color: var(--line); }
-.footer-mark { color: var(--ink); font: 700 14px/1 ui-sans-serif, -apple-system, sans-serif; letter-spacing: -.085em; }
-.footer-mark span { font-size: 7px; vertical-align: 5px; letter-spacing: 0; margin-left: 1px; }
+.bottom-bar { height: 61px; padding: 0 11px; gap: 16px; font-size: 12.5px; color: var(--muted); }
+.footer-brand { display: inline-flex; align-items: center; gap: 9px; min-width: 0; color: var(--ink); }
+.footer-brand span { white-space: nowrap; color: var(--muted); }
+.footer-brand b { color: var(--ink); font-weight: 640; letter-spacing: -.02em; margin-right: 2px; }
+.footer-brand a, .footer-links a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--dash); text-underline-offset: 3px; transition: text-decoration-color 160ms, color 160ms; }
+.footer-brand a:hover, .footer-links a:hover { text-decoration-color: currentColor; }
+.footer-links { display: inline-flex; align-items: center; gap: 18px; }
+.footer-links a { display: inline-flex; align-items: center; gap: 3px; color: var(--muted); }
+.footer-links a:hover { color: var(--ink); }
+
+/* Scrollbars in the app's colours: thin, no arrows. Chromium and Safari use the ::-webkit
+   rules; Firefox, which has no ::-webkit-scrollbar, gets the standard properties. */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background-color: var(--dash); border: 3px solid transparent; border-radius: 99px; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background-color: var(--faint); }
+::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+::-webkit-scrollbar-corner { background: transparent; }
+@supports not selector(::-webkit-scrollbar) {
+  * { scrollbar-width: thin; scrollbar-color: var(--dash) transparent; }
+}
 
 @media (min-width: 1100px) {
   .app-shell { padding: 17px; }
@@ -338,8 +377,8 @@ a { color: inherit; text-decoration: none; }
   .export-footnote { flex-wrap: wrap; gap: 3px 12px; margin-top: 10px; }
   .export-footnote span:first-child { min-width: 0; overflow-wrap: anywhere; }
   .another-file { margin: 18px auto 0; }
-  .bottom-bar { height: 43px; padding: 0 5px; font-size: 8px; letter-spacing: .01em; }
-  .footer-right > span:first-child { display: none; }
+  .bottom-bar { height: 46px; padding: 0 5px; font-size: 11px; }
+  .footer-links { gap: 12px; }
 }
 @media (max-width: 380px) {
   .brand-description { font-size: 10px; }
@@ -422,8 +461,6 @@ a { color: inherit; text-decoration: none; }
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scrollbar-gutter: stable;
-  scrollbar-width: thin;
-  scrollbar-color: var(--faint) transparent;
   padding-right: 4px;
 }
 .queue-list::-webkit-scrollbar { width: 5px; }
@@ -496,7 +533,7 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 360px) {
   /* Keep the add control and status legible on 320px phones. */
-  .topbar .brand-divider, .topbar .brand-description { display: none; }
+  .topbar .brand-name { font-size: 14px; }
   .topbar-right { letter-spacing: 0; }
 }
 
